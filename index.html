@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>长沙小学新5年级 · 首通记录规划助手（独立版）</title>
+  <script src="./vendor/tailwindcss.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            yuan: {
+              50: '#FFF8F0', 100: '#FFECD6', 200: '#FFD6A8', 300: '#FFBB73',
+              400: '#FF9E3D', 500: '#FF8C14', 600: '#FF6D00', 700: '#E55D00',
+              800: '#C44E00', 900: '#A03F00',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="./vendor/iconify-icon.min.js"></script>
+  <script src="./vendor/html2canvas.min.js"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+    * { font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #FFD6A8; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #FFBB73; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,109,0,0.3); } 50% { box-shadow: 0 0 20px 4px rgba(255,109,0,0.15); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    .float-anim { animation: float 3s ease-in-out infinite; }
+    .roadmap-connector { position: relative; }
+    .roadmap-connector::before { content: ''; position: absolute; left: 22px; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0.2)); }
+    .station-dot { position: relative; z-index: 2; width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: #FF6D00; background: white; box-shadow: 0 4px 15px rgba(255,109,0,0.3); flex-shrink: 0; }
+    #planPoster { background: linear-gradient(165deg, #FF7E1F 0%, #FF6D00 30%, #FF8C14 60%, #FFB347 100%); }
+    #parentScreenshotCard { box-sizing: border-box; }
+    .parent-card-content { width: min(100%, 360px); margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; }
+    .parent-card-badge { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 34px; padding: 0 18px; border-radius: 999px; background: #ECFDF5; border: 1px solid #BBF7D0; color: #047857; font-size: 14px; font-weight: 800; white-space: nowrap; }
+    .parent-card-hero { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+    .parent-card-check { width: 58px; height: 58px; border-radius: 20px; background: #34D399; color: white; display: flex; align-items: center; justify-content: center; font-size: 36px; line-height: 1; font-weight: 900; box-shadow: 0 10px 22px rgba(52, 211, 153, 0.22); }
+    .parent-card-name { color: #6B7280; font-size: 15px; font-weight: 600; line-height: 1.25; }
+    .parent-card-title { color: #047857; font-size: 32px; line-height: 1.12; font-weight: 900; letter-spacing: 0; }
+    .parent-card-rule { width: 100%; min-height: 70px; padding: 0 18px; border-radius: 18px; background: rgba(255, 255, 255, 0.92); border: 1px solid #FED7AA; display: flex; align-items: center; justify-content: center; gap: 10px; box-sizing: border-box; }
+    .parent-card-rule-text { color: #1F2937; font-size: 17px; line-height: 1.35; font-weight: 800; }
+    .parent-card-deadline { width: 100%; padding: 22px 18px; border-radius: 20px; background: linear-gradient(135deg, #FF6D00, #FF8C14); color: white; box-shadow: 0 12px 24px rgba(255, 109, 0, 0.18); box-sizing: border-box; }
+    .parent-card-deadline-label { display: flex; align-items: center; justify-content: center; gap: 8px; color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 800; margin-bottom: 12px; }
+    .parent-card-deadline-time { font-size: 32px; line-height: 1.1; font-weight: 900; letter-spacing: 0; }
+    .parent-card-deadline-hint { margin-top: 10px; color: rgba(255,255,255,0.88); font-size: 13px; line-height: 1.45; font-weight: 600; }
+    .parent-card-cta { width: 100%; height: 58px; border-radius: 20px; background: linear-gradient(90deg, #FF6D00, #FF8C14); color: white; display: flex; align-items: center; justify-content: center; border: 0; box-shadow: 0 12px 24px rgba(255, 109, 0, 0.2); font-size: 18px; line-height: 1; font-weight: 900; letter-spacing: 0; }
+    .parent-card-subcopy { margin-top: -10px; color: #9CA3AF; font-size: 13px; line-height: 1.35; font-weight: 600; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #FF6D00; box-shadow: 0 0 0 3px rgba(255,109,0,0.1); }
+    .dot-pattern { background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px); background-size: 20px 20px; }
+  </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen" x-data="app" x-cloak>
+
+  <!-- ==================== LOGIN PAGE ==================== -->
+  <template x-if="currentPage === 'login'">
+    <div class="min-h-screen bg-gradient-to-br from-yuan-50 via-white to-yuan-100 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl shadow-xl p-8 w-full max-w-sm fade-in-up">
+        <div class="text-center mb-8">
+          <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-yuan-400 to-yuan-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <iconify-icon icon="lucide:graduation-cap" width="40" class="text-white"></iconify-icon>
+          </div>
+          <h1 class="text-xl font-bold text-gray-800">长沙小学新5年级</h1>
+          <p class="text-sm text-gray-400 mt-1">首通记录规划助手（独立版）</p>
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-600 mb-2">请输入您的姓名</label>
+          <input type="text" x-model="loginName" placeholder="输入姓名开始使用"
+            class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm"
+            @keydown.enter="login()" />
+        </div>
+        <button @click="login()" :disabled="!loginName.trim()"
+          class="w-full bg-gradient-to-r from-yuan-600 to-yuan-500 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all disabled:opacity-50">
+          进 入
+        </button>
+        <p class="text-center text-[11px] text-gray-400 mt-4">数据保存在本设备，可一键复制学员信息发送至企微群</p>
+        <div class="border-t border-gray-100 mt-6 pt-5">
+          <p class="text-center text-xs text-gray-500 mb-3">质检模式：导入其他老师的数据查看</p>
+          <button @click="showImportModal = true"
+            class="w-full border-2 border-dashed border-gray-300 text-gray-500 py-2.5 rounded-xl text-sm font-medium hover:border-yuan-400 hover:text-yuan-600 transition-all flex items-center justify-center gap-2">
+            <iconify-icon icon="lucide:download" width="16"></iconify-icon>
+            导入数据码
+          </button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- ==================== MAIN APP ==================== -->
+  <template x-if="currentPage === 'main' && !showPlan">
+    <div class="flex flex-col h-screen">
+
+      <!-- Header -->
+      <header class="bg-gradient-to-r from-yuan-700 via-yuan-600 to-yuan-500 text-white px-3 py-2.5 md:px-6 flex items-center justify-between shadow-xl relative overflow-hidden">
+        <div class="absolute inset-0 dot-pattern opacity-30"></div>
+        <div class="flex items-center gap-2 md:gap-3 relative z-10">
+          <button @click="showSidebar = !showSidebar" class="w-9 h-9 rounded-full bg-white/20 backdrop-blur flex items-center justify-center md:hidden">
+            <iconify-icon :icon="showSidebar ? 'lucide:x' : 'lucide:menu'" width="20" class="text-white"></iconify-icon>
+          </button>
+          <div class="w-9 h-9 rounded-full bg-white/20 backdrop-blur items-center justify-center hidden md:flex">
+            <iconify-icon icon="lucide:graduation-cap" width="20" class="text-white"></iconify-icon>
+          </div>
+          <div>
+            <h1 class="text-sm md:text-base font-bold tracking-wide">长沙小学新5年级</h1>
+            <p class="text-[10px] opacity-75">首通记录规划助手 · 独立版</p>
+          </div>
+        </div>
+        <div class="relative z-10 flex items-center gap-2">
+          <div class="flex items-center gap-1.5 bg-white/15 backdrop-blur rounded-full px-2.5 py-1">
+            <iconify-icon icon="lucide:user" width="13" class="text-white/80"></iconify-icon>
+            <span class="text-xs text-white" x-text="userName"></span>
+          </div>
+          <button @click="exportData()" class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center hover:bg-white/25 transition" title="导出数据">
+            <iconify-icon icon="lucide:upload" width="15" class="text-white"></iconify-icon>
+          </button>
+          <button @click="logout()" class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center hover:bg-white/25 transition" title="退出登录">
+            <iconify-icon icon="lucide:log-out" width="15" class="text-white"></iconify-icon>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Layout -->
+      <div class="flex flex-1 overflow-hidden relative">
+
+        <!-- Mobile Backdrop -->
+        <div x-show="showSidebar" @click="showSidebar = false"
+          class="absolute inset-0 bg-black/40 z-30 md:hidden"
+          x-transition:enter="transition-opacity ease-out duration-200"
+          x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+          x-transition:leave="transition-opacity ease-in duration-150"
+          x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+
+        <!-- Sidebar -->
+        <aside class="absolute inset-y-0 left-0 z-40 w-72 bg-white border-r border-gray-100 flex flex-col shadow-lg transition-transform duration-200 md:relative md:inset-auto md:z-auto md:shadow-sm md:transition-none"
+          :class="showSidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0'">
+          <div class="flex flex-col h-full">
+            <div class="p-4 space-y-3">
+              <!-- 期数选择器 -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">期数</span>
+                  <button @click="showBatchInput = !showBatchInput" class="text-yuan-600 hover:text-yuan-700 transition" :title="showBatchInput ? '取消' : '新建期数'">
+                    <iconify-icon :icon="showBatchInput ? 'lucide:x' : 'lucide:plus-circle'" width="18"></iconify-icon>
+                  </button>
+                </div>
+                <template x-if="showBatchInput">
+                  <div class="flex gap-2 fade-in-up">
+                    <input type="text" x-model="newBatchName" placeholder="例如：第1期" @keydown.enter="addBatch()"
+                      class="flex-1 px-3 py-1.5 text-sm border border-yuan-300 rounded-lg bg-yuan-50 focus:ring-2 focus:ring-yuan-400" />
+                    <button @click="addBatch()" class="px-3 py-1.5 bg-yuan-500 text-white text-sm rounded-lg hover:bg-yuan-600 font-medium">确定</button>
+                  </div>
+                </template>
+                <div class="flex flex-wrap gap-1.5">
+                  <template x-for="b in batches" :key="b">
+                    <div class="group relative">
+                      <button @click="switchBatch(b)"
+                        class="px-3 py-1 text-xs rounded-full font-medium transition-all border"
+                        :class="currentBatch === b ? 'bg-yuan-500 text-white border-yuan-500 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:border-yuan-300 hover:text-yuan-600'">
+                        <span x-text="b"></span>
+                        <span class="ml-1 opacity-60" x-text="'(' + students.filter(s => s.batch === b).length + ')'"></span>
+                      </button>
+                      <button @click.stop="deleteBatch(b)" class="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white rounded-full text-[10px] leading-none flex items-center justify-center hover:bg-red-600 md:opacity-0 md:group-hover:opacity-100 transition-opacity" title="删除期数">&times;</button>
+                    </div>
+                  </template>
+                  <template x-if="batches.length === 0">
+                    <span class="text-xs text-gray-400 py-1">点击 + 创建第一个期数</span>
+                  </template>
+                </div>
+              </div>
+              <button @click="newStudent()"
+                class="w-full bg-gradient-to-r from-yuan-600 to-yuan-500 hover:from-yuan-700 hover:to-yuan-600 text-white rounded-xl py-2.5 font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all">
+                <iconify-icon icon="lucide:user-plus" width="18"></iconify-icon>
+                新建学员
+              </button>
+              <div class="relative">
+                <iconify-icon icon="lucide:search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="16"></iconify-icon>
+                <input type="text" x-model="searchQuery" placeholder="搜索学员..."
+                  class="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50" />
+              </div>
+            </div>
+            <div class="flex-1 overflow-y-auto px-3 pb-3">
+              <template x-if="filteredStudents.length === 0">
+                <div class="text-center py-10 text-gray-400">
+                  <iconify-icon icon="lucide:users" width="36" class="opacity-40"></iconify-icon>
+                  <p class="text-sm mt-2">暂无学员</p>
+                </div>
+              </template>
+              <div class="space-y-3">
+                <template x-for="section in studentDeadlineSections" :key="section.key">
+                  <div class="space-y-2">
+                    <template x-if="section.label">
+                      <button type="button" @click="toggleDeadlineSection(section.key)"
+                        class="sticky top-0 z-10 w-full flex items-center justify-between rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold backdrop-blur transition-colors"
+                        :class="section.tone === 'danger' ? 'bg-red-50/95 border-red-200 text-red-700' : section.isReminder ? 'bg-yuan-50/95 border-yuan-200 text-yuan-700' : 'bg-white/95 border-gray-100 text-gray-500'">
+                        <span class="flex items-center gap-1">
+                          <iconify-icon :icon="section.tone === 'danger' ? 'lucide:alert-triangle' : section.isReminder ? 'lucide:alarm-clock' : 'lucide:users'" width="12"></iconify-icon>
+                          <span x-text="section.label"></span>
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                          <span x-text="section.students.length + '人'"></span>
+                          <iconify-icon icon="lucide:chevron-down" width="13" class="transition-transform"
+                            :class="isSectionCollapsed(section.key) ? '-rotate-90' : 'rotate-0'"></iconify-icon>
+                        </span>
+                      </button>
+                    </template>
+                    <template x-for="s in isSectionCollapsed(section.key) ? [] : section.students" :key="s.id">
+                      <div @click="selectStudent(s)"
+                        class="p-3 rounded-xl border-2 cursor-pointer transition-all hover:shadow-md"
+                        :class="studentCardClass(s)">
+                        <div class="flex items-center justify-between mb-1.5">
+                          <span class="font-semibold text-gray-800 text-sm" x-text="s.name"></span>
+                          <div class="flex items-center gap-1">
+                            <template x-if="s.pushed">
+                              <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-green-50 text-green-600 border border-green-200">已推送</span>
+                            </template>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                              :class="studentStatusColor(s)" x-text="studentStatusText(s)"></span>
+                          </div>
+                        </div>
+                        <div class="flex gap-3 text-[11px] text-gray-500">
+                          <span>语<span class="font-semibold text-gray-700 ml-0.5" x-text="s.chineseScore || '-'"></span></span>
+                          <span>数<span class="font-semibold text-gray-700 ml-0.5" x-text="s.mathScore || '-'"></span></span>
+                          <span>英<span class="font-semibold text-gray-700 ml-0.5" x-text="s.englishScore || '-'"></span></span>
+                        </div>
+                        <template x-if="s.status === 'pending_test' && s.testDeadline">
+                          <div class="mt-1.5 flex items-center gap-1 text-[11px] px-2 py-1 rounded-md border"
+                            :class="deadlinePillClass(s)">
+                            <iconify-icon :icon="isStudentOverdue(s) ? 'lucide:alert-triangle' : 'lucide:clock'" width="12"></iconify-icon>
+                            <span>截止：<span class="font-semibold" x-text="s.testDeadline"></span></span>
+                          </div>
+                        </template>
+                        <template x-if="s.status === 'pending_test' && !s.testDeadline">
+                          <div class="mt-1.5 flex items-center gap-1 text-[11px] px-2 py-1 rounded-md bg-red-50 border border-red-200 text-red-600">
+                            <iconify-icon icon="lucide:alert-circle" width="12" class="text-red-400"></iconify-icon>
+                            <span>未设截止时间</span>
+                          </div>
+                        </template>
+                        <template x-if="s.status === 'pending_test'">
+                          <button type="button" @click.stop="completeTest(s)"
+                            class="mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg bg-blue-500 px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-blue-600 transition">
+                            <iconify-icon icon="lucide:check-circle" width="13"></iconify-icon>
+                            完成摸底
+                          </button>
+                        </template>
+                        <template x-if="isStudentOverdue(s)">
+                          <div @click.stop class="mt-2 rounded-lg border border-red-200 bg-red-50 p-2">
+                            <label class="mb-1 block text-[11px] font-semibold text-red-700">超时原因</label>
+                            <textarea x-model="s.overdueReason" @blur="saveOverdueReason(s)" rows="2" placeholder="填写未按时完成原因..."
+                              class="w-full resize-none rounded-md border border-red-200 bg-white px-2 py-1.5 text-[12px] text-red-700 outline-none focus:border-red-400"></textarea>
+                          </div>
+                        </template>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </div>
+            </div>
+            <div class="p-3 border-t border-gray-100 bg-gray-50">
+              <!-- 流程步骤指示 -->
+              <div class="flex items-center justify-center gap-1 mb-2 text-[10px] text-gray-400">
+                <span>首通</span><span>→</span><span>待摸底</span><span>→</span><span>已摸底</span>
+              </div>
+              <div class="grid grid-cols-4 gap-1 text-center text-[10px] text-gray-500">
+                <div @click="setFilter('all')" class="cursor-pointer px-1 py-1.5 rounded-lg transition-all" :class="filterMode === 'all' ? 'bg-gray-200 ring-2 ring-gray-300' : 'hover:bg-gray-100'">
+                  <div class="font-bold text-base text-gray-700" x-text="batchStudents.length"></div><div>总学员</div>
+                </div>
+                <div @click="setFilter('pending_test')" class="cursor-pointer px-1 py-1.5 rounded-lg transition-all" :class="filterMode === 'pending_test' ? 'bg-yuan-100 ring-2 ring-yuan-400' : 'hover:bg-yuan-50'">
+                  <div class="font-bold text-base text-yuan-600" x-text="batchStudents.filter(s => s.status === 'pending_test').length"></div><div>待摸底</div>
+                </div>
+                <div @click="setFilter('test_done')" class="cursor-pointer px-1 py-1.5 rounded-lg transition-all" :class="filterMode === 'test_done' ? 'bg-blue-100 ring-2 ring-blue-400' : 'hover:bg-blue-50'">
+                  <div class="font-bold text-base text-blue-600" x-text="batchStudents.filter(s => normalizedStatus(s.status) === 'test_done').length"></div><div>已摸底</div>
+                </div>
+                <div @click="setFilter('overdue')" class="cursor-pointer px-1 py-1.5 rounded-lg transition-all" :class="filterMode === 'overdue' ? 'bg-red-100 ring-2 ring-red-400' : 'hover:bg-red-50'">
+                  <div class="font-bold text-base text-red-600" x-text="batchStudents.filter(s => isStudentOverdue(s)).length"></div><div class="leading-tight">超时<br>未完成</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- ==================== CONTENT AREA ==================== -->
+        <main class="flex-1 overflow-y-auto bg-gradient-to-br from-gray-50 to-yuan-50/30">
+
+          <!-- ===== Welcome ===== -->
+          <template x-if="currentView === 'empty'">
+            <div class="flex flex-col items-center justify-center h-full fade-in-up">
+              <div class="float-anim mb-6">
+                <div class="w-28 h-28 rounded-3xl bg-gradient-to-br from-yuan-400 to-yuan-600 flex items-center justify-center shadow-xl">
+                  <iconify-icon icon="lucide:book-open-check" width="56" class="text-white"></iconify-icon>
+                </div>
+              </div>
+              <h2 class="text-xl font-bold text-gray-700 mb-2">欢迎使用首通规划助手</h2>
+              <p class="text-gray-400 text-sm mb-2">点击「新建学员」开始首通信息采集</p>
+              <p class="text-gray-300 text-xs mb-6">保存后可一键推送至企微群</p>
+              <button @click="newStudent()"
+                class="bg-gradient-to-r from-yuan-600 to-yuan-500 text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
+                <iconify-icon icon="lucide:plus" width="18"></iconify-icon>
+                新建学员
+              </button>
+            </div>
+          </template>
+
+          <!-- ===== First Call Form ===== -->
+          <template x-if="currentView === 'firstCall'">
+            <div class="max-w-2xl mx-auto p-4 md:p-8 fade-in-up">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-yuan-100 flex items-center justify-center">
+                  <iconify-icon icon="lucide:phone-call" class="text-yuan-600" width="20"></iconify-icon>
+                </div>
+                <div>
+                  <h2 class="text-xl font-bold text-gray-800">首通信息采集</h2>
+                  <p class="text-sm text-gray-400">记录首次通话中获取的学员信息</p>
+                </div>
+              </div>
+              <form @submit.prevent="saveFirstCall()" class="space-y-5">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
+                  <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                    <iconify-icon icon="lucide:user" class="text-yuan-500" width="18"></iconify-icon> 基本信息
+                  </h3>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1.5">学员姓名 <span class="text-red-400">*</span></label>
+                    <input type="text" x-model="form.name" required placeholder="请输入学员姓名" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm" />
+                  </div>
+                  <div class="mt-3">
+                    <label class="block text-sm font-medium text-gray-600 mb-1.5">年级</label>
+                    <input type="text" value="四年级下册" disabled class="w-full px-4 py-2.5 border border-gray-100 rounded-xl text-sm bg-gray-50 text-gray-500" />
+                  </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
+                  <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                    <iconify-icon icon="lucide:clipboard-list" class="text-yuan-500" width="18"></iconify-icon> 学情信息
+                  </h3>
+                  <div class="space-y-5">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-600 mb-2">当前成绩</label>
+                      <div class="grid grid-cols-3 gap-3 md:gap-4">
+	                        <div>
+	                          <div class="text-xs text-gray-400 mb-1 text-center">语文</div>
+	                          <div class="relative">
+	                            <input type="text" inputmode="numeric" pattern="[0-9]*" x-model="form.chineseScore" placeholder="0" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-center" />
+	                            <span class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">分</span>
+	                          </div>
+	                          <div class="flex flex-wrap justify-center gap-1 mt-1.5">
+	                            <template x-for="score in quickScores" :key="'c' + score">
+	                              <button type="button" @click="form.chineseScore = score" class="px-2 py-1 rounded-full text-[10px] border transition"
+	                                :class="Number(form.chineseScore) === score ? 'bg-yuan-500 text-white border-yuan-500' : 'bg-gray-50 text-gray-500 border-gray-200'">
+	                                <span x-text="score"></span>
+	                              </button>
+	                            </template>
+	                          </div>
+	                        </div>
+	                        <div>
+	                          <div class="text-xs text-gray-400 mb-1 text-center">数学</div>
+	                          <div class="relative">
+	                            <input type="text" inputmode="numeric" pattern="[0-9]*" x-model="form.mathScore" placeholder="0" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-center" />
+	                            <span class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">分</span>
+	                          </div>
+	                          <div class="flex flex-wrap justify-center gap-1 mt-1.5">
+	                            <template x-for="score in quickScores" :key="'m' + score">
+	                              <button type="button" @click="form.mathScore = score" class="px-2 py-1 rounded-full text-[10px] border transition"
+	                                :class="Number(form.mathScore) === score ? 'bg-yuan-500 text-white border-yuan-500' : 'bg-gray-50 text-gray-500 border-gray-200'">
+	                                <span x-text="score"></span>
+	                              </button>
+	                            </template>
+	                          </div>
+	                        </div>
+	                        <div>
+	                          <div class="text-xs text-gray-400 mb-1 text-center">英语</div>
+	                          <div class="relative">
+	                            <input type="text" inputmode="numeric" pattern="[0-9]*" x-model="form.englishScore" placeholder="0" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-center" />
+	                            <span class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">分</span>
+	                          </div>
+	                          <div class="flex flex-wrap justify-center gap-1 mt-1.5">
+	                            <template x-for="score in quickScores" :key="'e' + score">
+	                              <button type="button" @click="form.englishScore = score" class="px-2 py-1 rounded-full text-[10px] border transition"
+	                                :class="Number(form.englishScore) === score ? 'bg-yuan-500 text-white border-yuan-500' : 'bg-gray-50 text-gray-500 border-gray-200'">
+	                                <span x-text="score"></span>
+	                              </button>
+	                            </template>
+	                          </div>
+	                        </div>
+                      </div>
+                    </div>
+                    <hr class="border-gray-100" />
+                    <div>
+                      <label class="block text-sm font-medium text-gray-600 mb-2">薄弱点 <span class="text-red-400">*</span></label>
+                      <div class="flex flex-wrap gap-2 mb-3">
+                        <template x-for="tag in weakPointTags" :key="tag">
+                          <button type="button" @click="toggleWeakTag(tag)"
+                            class="px-3 py-1.5 rounded-full text-xs font-medium border transition-all"
+                            :class="form.weakTags.includes(tag) ? 'bg-yuan-500 text-white border-yuan-500 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:border-yuan-300 hover:text-yuan-600'"
+                            x-text="tag"></button>
+                        </template>
+                      </div>
+                      <textarea x-model="form.weakPoints" rows="2" placeholder="点击上方标签快捷填入，也可直接输入补充..."
+                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm resize-none"></textarea>
+                    </div>
+                    <hr class="border-gray-100" />
+	                    <div>
+	                      <label class="block text-sm font-medium text-gray-600 mb-1.5">学习负责人</label>
+	                      <div class="flex flex-wrap gap-2 mb-2">
+	                        <template x-for="item in supervisorOptions" :key="item">
+	                          <button type="button" @click="form.supervisor = item" class="px-3 py-1.5 rounded-full text-xs border transition"
+	                            :class="form.supervisor === item ? 'bg-yuan-500 text-white border-yuan-500' : 'bg-white text-gray-600 border-gray-200 hover:border-yuan-300'">
+	                            <span x-text="item"></span>
+	                          </button>
+	                        </template>
+	                      </div>
+	                      <input type="text" x-model="form.supervisor" placeholder="例如：妈妈、爸爸、奶奶等" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm" />
+	                    </div>
+		                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+		                      <div>
+		                        <label class="block text-sm font-medium text-gray-600 mb-1.5">几点放学</label>
+		                        <div class="flex flex-wrap gap-1.5 mb-2">
+		                          <template x-for="item in dismissalOptions" :key="item">
+		                            <button type="button" @click="form.dismissalTime = item" class="px-2.5 py-1.5 rounded-full text-xs border transition"
+	                              :class="form.dismissalTime === item ? 'bg-yuan-500 text-white border-yuan-500' : 'bg-white text-gray-600 border-gray-200'">
+	                              <span x-text="item"></span>
+		                            </button>
+		                          </template>
+		                        </div>
+		                        <input type="time" x-model="form.dismissalTime" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm" />
+		                      </div>
+		                      <div>
+		                        <label class="block text-sm font-medium text-gray-600 mb-1.5">几点到家</label>
+		                        <div class="flex flex-wrap gap-1.5 mb-2">
+		                          <template x-for="item in homeArrivalOptions" :key="item">
+		                            <button type="button" @click="form.homeArrivalTime = item" class="px-2.5 py-1.5 rounded-full text-xs border transition"
+		                              :class="form.homeArrivalTime === item ? 'bg-yuan-500 text-white border-yuan-500' : 'bg-white text-gray-600 border-gray-200'">
+		                              <span x-text="item"></span>
+		                            </button>
+		                          </template>
+		                        </div>
+		                        <input type="time" x-model="form.homeArrivalTime" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm" />
+		                      </div>
+		                    </div>
+		                    <div>
+		                        <label class="block text-sm font-medium text-gray-600 mb-1.5">作业时间</label>
+		                        <div class="flex flex-wrap gap-1.5 mb-2">
+		                          <template x-for="item in homeworkOptions" :key="item">
+		                            <button type="button" @click="form.homeworkTime = item" class="px-2.5 py-1.5 rounded-full text-xs border transition"
+	                              :class="form.homeworkTime === item ? 'bg-yuan-500 text-white border-yuan-500' : 'bg-white text-gray-600 border-gray-200'">
+	                              <span x-text="item"></span>
+	                            </button>
+		                          </template>
+		                        </div>
+		                        <input type="text" x-model="form.homeworkTime" placeholder="例如：17:00-19:00" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm" />
+		                    </div>
+	                    <div>
+	                      <label class="block text-sm font-medium text-gray-600 mb-1.5">补习班安排</label>
+	                      <div class="flex flex-wrap gap-2 mb-2">
+	                        <template x-for="item in tutoringOptions" :key="item">
+	                          <button type="button" @click="form.tutoring = item" class="px-3 py-1.5 rounded-full text-xs border transition"
+	                            :class="form.tutoring === item ? 'bg-yuan-500 text-white border-yuan-500' : 'bg-white text-gray-600 border-gray-200 hover:border-yuan-300'">
+	                            <span x-text="item"></span>
+	                          </button>
+	                        </template>
+	                      </div>
+	                      <textarea x-model="form.tutoring" rows="2" placeholder="例如：周六上午数学班（学而思），周日下午英语班；或填写「无」"
+	                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm resize-none"></textarea>
+	                    </div>
+	                    <div>
+	                      <label class="block text-sm font-medium text-gray-600 mb-1.5">摸底测截止完成时间</label>
+	                      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+	                        <button type="button" @click="setDeadlinePreset('tonight1900')" class="px-3 py-2 rounded-xl text-xs border border-yuan-200 bg-yuan-50 text-yuan-700 font-medium">今晚19:00</button>
+	                        <button type="button" @click="setDeadlinePreset('tonight2000')" class="px-3 py-2 rounded-xl text-xs border border-yuan-200 bg-yuan-50 text-yuan-700 font-medium">今晚20:00</button>
+	                        <button type="button" @click="setDeadlinePreset('tonight2030')" class="px-3 py-2 rounded-xl text-xs border border-yuan-200 bg-yuan-50 text-yuan-700 font-medium">今晚20:30</button>
+	                        <button type="button" @click="setDeadlinePreset('tonight2100')" class="px-3 py-2 rounded-xl text-xs border border-yuan-200 bg-yuan-50 text-yuan-700 font-medium">今晚21:00</button>
+	                      </div>
+	                      <input type="datetime-local" x-model="form.testDeadline" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm" />
+	                    </div>
+                    <hr class="border-gray-100" />
+                    <div>
+                      <label class="block text-sm font-medium text-gray-600 mb-2">是否下载猿辅导APP</label>
+                      <div class="flex gap-3">
+                        <button type="button" @click="form.hasApp = '是'"
+                          class="flex-1 py-2.5 rounded-xl text-sm font-medium border-2 transition-all flex items-center justify-center gap-1.5"
+                          :class="form.hasApp === '是' ? 'border-green-400 bg-green-50 text-green-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'">
+                          <iconify-icon icon="lucide:check-circle" width="16" x-show="form.hasApp === '是'"></iconify-icon>
+                          是
+                        </button>
+                        <button type="button" @click="form.hasApp = '否'"
+                          class="flex-1 py-2.5 rounded-xl text-sm font-medium border-2 transition-all flex items-center justify-center gap-1.5"
+                          :class="form.hasApp === '否' ? 'border-red-400 bg-red-50 text-red-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'">
+                          <iconify-icon icon="lucide:x-circle" width="16" x-show="form.hasApp === '否'"></iconify-icon>
+                          否
+                        </button>
+                      </div>
+                    </div>
+	                    <div>
+	                      <label class="block text-sm font-medium text-gray-600 mb-1.5">首通备注</label>
+	                      <div class="flex flex-wrap gap-2 mb-2">
+	                        <template x-for="item in noteOptions" :key="item">
+	                          <button type="button" @click="appendFormText('notes', item)" class="px-3 py-1.5 rounded-full text-xs border border-gray-200 bg-white text-gray-600 hover:border-yuan-300 transition">
+	                            <span x-text="item"></span>
+	                          </button>
+	                        </template>
+	                      </div>
+	                      <textarea x-model="form.notes" rows="2" placeholder="家长关注点、学习习惯、其他补充信息..."
+	                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm resize-none"></textarea>
+	                    </div>
+                  </div>
+                </div>
+                <div class="flex gap-3 pt-2">
+                  <button type="button" @click="cancelForm()" class="px-6 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition">取消</button>
+                  <button type="submit" class="flex-1 bg-gradient-to-r from-yuan-600 to-yuan-500 text-white py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                    <iconify-icon icon="lucide:save" width="18"></iconify-icon> 保存并安排摸底测
+                  </button>
+                </div>
+              </form>
+            </div>
+          </template>
+
+          <!-- ===== Student Detail ===== -->
+          <template x-if="currentView === 'detail' && selectedStudent">
+            <div class="max-w-2xl mx-auto p-4 md:p-8 fade-in-up">
+              <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-yuan-400 to-yuan-600 flex items-center justify-center text-white font-bold text-lg"
+                    x-text="selectedStudent.name?.charAt(0)"></div>
+                  <div>
+                    <h2 class="text-xl font-bold text-gray-800" x-text="selectedStudent.name"></h2>
+                    <p class="text-sm text-gray-400">四年级下册</p>
+                  </div>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold" :class="statusColor(selectedStudent.status)" x-text="statusText(selectedStudent.status)"></span>
+              </div>
+
+              <!-- Parent Screenshot Card -->
+              <div id="parentScreenshotCard" class="relative overflow-hidden bg-gradient-to-br from-white via-[#F3FBF7] to-[#F0FDF4] border border-emerald-100 rounded-3xl p-6 md:p-7 mb-6 shadow-sm">
+                <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-emerald-400 via-emerald-300 to-green-200"></div>
+                <div class="screenshot-hide absolute top-4 right-4 flex items-center gap-1.5 opacity-45 hover:opacity-100 transition-opacity">
+                  <button @click="editStatusBanner()" class="w-8 h-8 rounded-full bg-white/80 border border-gray-100 flex items-center justify-center hover:bg-white transition shadow-sm" title="编辑名字">
+                    <iconify-icon icon="lucide:pencil" width="14" class="text-gray-500"></iconify-icon>
+                  </button>
+                  <button @click="copyParentCardImage()" class="w-8 h-8 rounded-full bg-white/80 border border-gray-100 flex items-center justify-center hover:bg-white transition shadow-sm" title="复制图片">
+                    <iconify-icon :icon="copiedBanner ? 'lucide:check' : 'lucide:copy'" width="14" class="text-gray-500"></iconify-icon>
+                  </button>
+                </div>
+                <div class="parent-card-content">
+                  <div class="parent-card-badge">
+                    <iconify-icon icon="lucide:badge-check" width="14"></iconify-icon>
+                    学习进度确认
+                  </div>
+                  <div class="parent-card-hero">
+                    <div class="parent-card-check">
+                      ✓
+                    </div>
+                    <div>
+                      <p class="parent-card-name" x-text="(statusBannerName || selectedStudent.name) + '同学'"></p>
+                      <h3 class="parent-card-title">成绩已植入</h3>
+                    </div>
+                  </div>
+                  <div class="parent-card-rule">
+                    <iconify-icon icon="lucide:flag" width="22" class="text-yuan-600 flex-shrink-0"></iconify-icon>
+                    <p class="parent-card-rule-text">完成摸底测，即可参与分班安排哦～</p>
+                  </div>
+                  <div class="parent-card-deadline">
+                    <div class="parent-card-deadline-label">
+                      <iconify-icon icon="lucide:alarm-clock" width="16"></iconify-icon>
+                      摸底测截止时间
+                    </div>
+                    <div class="parent-card-deadline-time" x-text="selectedStudent.testDeadline || '请尽快完成'"></div>
+                    <div class="parent-card-deadline-hint" x-text="getDeadlineHint(selectedStudent.testDeadline)"></div>
+                  </div>
+                  <button type="button" class="parent-card-cta">
+                    打开猿辅导，完成摸底测
+                  </button>
+                  <p class="parent-card-subcopy">摸底测已同步至猿辅导APP，打开即可参与</p>
+                  </div>
+                </div>
+
+              <!-- Copy status -->
+              <template x-if="selectedStudent.pushed">
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-3.5 mb-4 flex items-center gap-2">
+                  <iconify-icon icon="lucide:check-circle" width="16" class="text-blue-500"></iconify-icon>
+                  <span class="text-sm text-blue-700">已复制发群 · <span class="text-xs text-blue-500" x-text="selectedStudent.pushedAt"></span></span>
+                </div>
+              </template>
+
+              <!-- Score Cards -->
+              <div class="grid grid-cols-3 gap-3 md:gap-4 mb-4">
+                <template x-for="item in [{label:'语文',score:selectedStudent.chineseScore,color:'from-red-400 to-rose-500'},{label:'数学',score:selectedStudent.mathScore,color:'from-blue-400 to-indigo-500'},{label:'英语',score:selectedStudent.englishScore,color:'from-green-400 to-emerald-500'}]" :key="item.label">
+                  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-center">
+                    <div class="text-xs text-gray-400 mb-1" x-text="item.label"></div>
+                    <div class="text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent" :class="item.color" x-text="item.score || '-'"></div>
+                  </div>
+                </template>
+              </div>
+
+              <template x-if="isStudentOverdue(selectedStudent)">
+                <div class="bg-red-50 rounded-2xl shadow-sm border border-red-200 p-5 mb-4">
+                  <h3 class="font-semibold text-red-700 mb-2 text-sm flex items-center gap-2">
+                    <iconify-icon icon="lucide:alert-triangle" class="text-red-500" width="16"></iconify-icon> 超时原因
+                  </h3>
+                  <p class="text-xs text-red-500 mb-2" x-text="'超过截止时间30分钟未完成，请填写原因'"></p>
+                  <textarea x-model="selectedStudent.overdueReason" @blur="saveSelectedOverdueReason()" rows="3" placeholder="例如：家长未及时打开APP、孩子正在补习班、老师已再次提醒..."
+                    class="w-full resize-none rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm text-red-700 outline-none focus:border-red-400"></textarea>
+                </div>
+              </template>
+
+              <!-- Info Tags -->
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                <template x-if="selectedStudent.supervisor">
+                  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 text-center">
+                    <div class="text-[10px] text-gray-400 mb-0.5">学习负责人</div>
+                    <div class="text-sm font-semibold text-gray-700" x-text="selectedStudent.supervisor"></div>
+                  </div>
+                </template>
+	                <template x-if="selectedStudent.dismissalTime">
+	                  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 text-center">
+	                    <div class="text-[10px] text-gray-400 mb-0.5">放学时间</div>
+	                    <div class="text-sm font-semibold text-gray-700" x-text="selectedStudent.dismissalTime"></div>
+	                  </div>
+	                </template>
+	                <template x-if="selectedStudent.homeArrivalTime">
+	                  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 text-center">
+	                    <div class="text-[10px] text-gray-400 mb-0.5">到家时间</div>
+	                    <div class="text-sm font-semibold text-gray-700" x-text="selectedStudent.homeArrivalTime"></div>
+	                  </div>
+	                </template>
+	                <template x-if="selectedStudent.homeworkTime">
+	                  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 text-center">
+	                    <div class="text-[10px] text-gray-400 mb-0.5">作业时间</div>
+	                    <div class="text-sm font-semibold text-gray-700" x-text="selectedStudent.homeworkTime"></div>
+                  </div>
+                </template>
+              </div>
+
+              <!-- Tutoring -->
+              <template x-if="selectedStudent.tutoring">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
+                  <h3 class="font-semibold text-gray-700 mb-2 text-sm flex items-center gap-2">
+                    <iconify-icon icon="lucide:calendar-clock" class="text-yuan-500" width="16"></iconify-icon> 补习班安排
+                  </h3>
+                  <p class="text-sm text-gray-600 leading-relaxed" x-text="selectedStudent.tutoring"></p>
+                </div>
+              </template>
+
+              <!-- Info Cards -->
+              <div class="space-y-4 mb-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                  <h3 class="font-semibold text-gray-700 mb-2 text-sm flex items-center gap-2">
+                    <iconify-icon icon="lucide:alert-triangle" class="text-yuan-500" width="16"></iconify-icon> 薄弱点
+                  </h3>
+                  <template x-if="selectedStudent.weakTags && selectedStudent.weakTags.length > 0">
+                    <div class="flex flex-wrap gap-1.5 mb-2">
+                      <template x-for="tag in selectedStudent.weakTags" :key="tag">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-yuan-100 text-yuan-700 border border-yuan-200" x-text="tag"></span>
+                      </template>
+                    </div>
+                  </template>
+                  <p class="text-sm text-gray-600 leading-relaxed" x-text="selectedStudent.weakPoints || '未填写'"></p>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                  <h3 class="font-semibold text-gray-700 mb-2 text-sm flex items-center gap-2">
+                    <iconify-icon icon="lucide:smartphone" class="text-yuan-500" width="16"></iconify-icon> 是否下载猿辅导APP
+                  </h3>
+                  <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                    :class="selectedStudent.hasApp === '是' ? 'bg-green-100 text-green-700' : selectedStudent.hasApp === '否' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-500'"
+                    x-text="selectedStudent.hasApp || '未填写'"></span>
+                </div>
+                <template x-if="selectedStudent.notes">
+                  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <h3 class="font-semibold text-gray-700 mb-2 text-sm flex items-center gap-2">
+                      <iconify-icon icon="lucide:message-square" class="text-yuan-500" width="16"></iconify-icon> 首通备注
+                    </h3>
+                    <p class="text-sm text-gray-600 leading-relaxed" x-text="selectedStudent.notes"></p>
+                  </div>
+                </template>
+                <template x-if="selectedStudent.testNotes">
+                  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <h3 class="font-semibold text-gray-700 mb-2 text-sm flex items-center gap-2">
+                      <iconify-icon icon="lucide:file-text" class="text-yuan-500" width="16"></iconify-icon> 摸底测分析
+                    </h3>
+                    <p class="text-sm text-gray-600 leading-relaxed" x-text="selectedStudent.testNotes"></p>
+                  </div>
+                </template>
+                <template x-if="selectedStudent.callIssues">
+                  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <h3 class="font-semibold text-gray-700 mb-2 text-sm flex items-center gap-2">
+                      <iconify-icon icon="lucide:phone-missed" class="text-yuan-500" width="16"></iconify-icon> 首通问题记录
+                    </h3>
+                    <p class="text-sm text-gray-600 leading-relaxed" x-text="selectedStudent.callIssues"></p>
+                  </div>
+                </template>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex flex-wrap gap-3">
+                <template x-if="selectedStudent.status === 'pending_test'">
+                  <button @click="completeTest(selectedStudent)" class="flex-1 bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                    <iconify-icon icon="lucide:check-circle" width="18"></iconify-icon> 完成摸底
+                  </button>
+                </template>
+                <template x-if="normalizedStatus(selectedStudent.status) === 'test_done'">
+                  <button type="button" class="px-4 py-3 border border-blue-200 bg-blue-50 rounded-xl text-sm text-blue-600 flex items-center gap-2 cursor-default">
+                    <iconify-icon icon="lucide:check-circle" width="16"></iconify-icon> 已完成摸底
+                  </button>
+                </template>
+                <button @click="copyStudentInfo()"
+                  class="px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all flex items-center gap-2">
+                  <iconify-icon :icon="copiedInfo ? 'lucide:check' : 'lucide:copy'" width="16"></iconify-icon>
+                  <span x-text="copiedInfo ? '已复制，去粘贴吧' : '复制发群'"></span>
+                </button>
+                <button @click="confirmDeleteStudent()" class="px-4 py-3 border border-red-200 rounded-xl text-sm text-red-500 hover:bg-red-50 transition flex items-center gap-2">
+                  <iconify-icon icon="lucide:trash-2" width="16"></iconify-icon>
+                </button>
+              </div>
+            </div>
+          </template>
+
+        </main>
+      </div>
+    </div>
+  </template>
+
+  <!-- ==================== PLAN VIEW ==================== -->
+  <template x-if="showPlan && planStudent">
+    <div class="min-h-screen bg-gray-100">
+      <div class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-gray-200 px-4 py-3 md:px-6 flex items-center justify-between">
+        <button @click="showPlan = false" class="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition text-sm">
+          <iconify-icon icon="lucide:arrow-left" width="18"></iconify-icon> 返回
+        </button>
+        <div class="flex items-center gap-2">
+          <button @click="copyPlanInfo()"
+            class="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+            <iconify-icon :icon="copiedInfo ? 'lucide:check' : 'lucide:copy'" width="16"></iconify-icon>
+            <span x-text="copiedInfo ? '已复制' : '复制发群'"></span>
+          </button>
+          <button @click="savePlanImage()" class="bg-gradient-to-r from-yuan-600 to-yuan-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+            <iconify-icon icon="lucide:download" width="16"></iconify-icon> 保存图片
+          </button>
+        </div>
+      </div>
+      <div class="flex justify-center py-4 px-3 md:py-8 md:px-4">
+        <div id="planPoster" class="w-full max-w-[420px] rounded-3xl overflow-hidden shadow-2xl">
+          <div class="relative px-6 pt-8 pb-6 text-center dot-pattern">
+            <div class="absolute top-4 left-4 w-20 h-20 rounded-full bg-white/10"></div>
+            <div class="absolute top-16 right-6 w-12 h-12 rounded-full bg-white/8"></div>
+            <div class="relative z-10">
+              <div class="flex justify-center mb-3">
+                <div class="w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+                  <iconify-icon icon="lucide:graduation-cap" width="36" class="text-white"></iconify-icon>
+                </div>
+              </div>
+              <h1 class="text-white text-2xl font-extrabold tracking-wider mb-1" style="text-shadow: 0 2px 8px rgba(0,0,0,0.15);">猿辅导</h1>
+              <div class="inline-block bg-white/20 backdrop-blur rounded-full px-4 py-1 mb-3">
+                <span class="text-white/90 text-xs tracking-widest">四年级下册 · 学习提分规划</span>
+              </div>
+              <div class="bg-white rounded-2xl mx-4 py-3 px-4 shadow-lg">
+                <p class="text-yuan-700 font-bold text-lg" x-text="planStudent.name + ' 同学专属学习路径'"></p>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 py-5 bg-gradient-to-b from-[#FF8C14] to-[#FF7E1F]">
+            <div class="bg-white/15 backdrop-blur rounded-2xl p-4">
+              <h3 class="text-white font-bold text-sm mb-4 flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-white/25 flex items-center justify-center text-[11px]">📊</span> 学情分析
+              </h3>
+              <div class="grid grid-cols-3 gap-3 mb-3">
+                <template x-for="item in [{label:'语文',score:planStudent.chineseScore,emoji:'📖'},{label:'数学',score:planStudent.mathScore,emoji:'🔢'},{label:'英语',score:planStudent.englishScore,emoji:'🔤'}]" :key="item.label">
+                  <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+                    <div class="text-lg mb-0.5" x-text="item.emoji"></div>
+                    <div class="text-[10px] text-gray-500 mb-1" x-text="item.label"></div>
+                    <div class="text-xl font-extrabold" :class="getScoreColor(item.score)" x-text="item.score || '-'"></div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 py-4 bg-[#FF7E1F]">
+            <div class="bg-white/15 backdrop-blur rounded-2xl p-4">
+              <h3 class="text-white font-bold text-sm mb-3 flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-white/25 flex items-center justify-center text-[11px]">🎯</span> 问题诊断
+              </h3>
+              <div class="space-y-2">
+                <div class="bg-white/90 rounded-xl p-3">
+                  <div class="text-[11px] font-semibold text-yuan-700 mb-1">薄弱环节</div>
+                  <p class="text-xs text-gray-600 leading-relaxed" x-text="planStudent.weakPoints"></p>
+                </div>
+                <template x-if="planStudent.testNotes">
+                  <div class="bg-white/90 rounded-xl p-3">
+                    <div class="text-[11px] font-semibold text-yuan-700 mb-1">摸底测分析</div>
+                    <p class="text-xs text-gray-600 leading-relaxed" x-text="planStudent.testNotes"></p>
+                  </div>
+                </template>
+                <template x-if="planStudent.callIssues">
+                  <div class="bg-white/90 rounded-xl p-3">
+                    <div class="text-[11px] font-semibold text-yuan-700 mb-1">专项问题</div>
+                    <p class="text-xs text-gray-600 leading-relaxed" x-text="planStudent.callIssues"></p>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 py-5 bg-gradient-to-b from-[#FF7E1F] to-[#FF6D00]">
+            <h3 class="text-white font-bold text-sm mb-5 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-white/25 flex items-center justify-center text-[11px]">🗺️</span> 提分路径规划
+            </h3>
+            <div class="roadmap-connector space-y-4 ml-[1px]">
+              <div class="flex items-start gap-4">
+                <div class="station-dot">1</div>
+                <div class="flex-1 bg-white rounded-2xl p-4 shadow-md">
+                  <h4 class="font-bold text-gray-800 text-sm mb-1">1v1 摸底测错题讲题</h4>
+                  <p class="text-xs text-gray-500 leading-relaxed">针对摸底测中的薄弱题型，由老师进行一对一深度讲解，夯实基础知识点。</p>
+                  <template x-if="getStationTip(1)"><div class="mt-2 bg-yuan-50 border border-yuan-200 rounded-lg px-3 py-2"><p class="text-[11px] text-yuan-700 font-medium" x-text="'💡 ' + getStationTip(1)"></p></div></template>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="station-dot">2</div>
+                <div class="flex-1 bg-white rounded-2xl p-4 shadow-md">
+                  <h4 class="font-bold text-gray-800 text-sm mb-1">口述题验收</h4>
+                  <p class="text-xs text-gray-500 leading-relaxed">通过口述解题过程，检验知识掌握程度，确保真正理解而非死记硬背。</p>
+                  <template x-if="getStationTip(2)"><div class="mt-2 bg-yuan-50 border border-yuan-200 rounded-lg px-3 py-2"><p class="text-[11px] text-yuan-700 font-medium" x-text="'💡 ' + getStationTip(2)"></p></div></template>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="station-dot">3</div>
+                <div class="flex-1 bg-white rounded-2xl p-4 shadow-md">
+                  <h4 class="font-bold text-gray-800 text-sm mb-1">大班答疑</h4>
+                  <p class="text-xs text-gray-500 leading-relaxed">在班级环境中进行集中答疑，培养课堂表达能力，解决共性难题。</p>
+                  <template x-if="getStationTip(3)"><div class="mt-2 bg-yuan-50 border border-yuan-200 rounded-lg px-3 py-2"><p class="text-[11px] text-yuan-700 font-medium" x-text="'💡 ' + getStationTip(3)"></p></div></template>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="station-dot">4</div>
+                <div class="flex-1">
+                  <div class="bg-white rounded-2xl p-4 shadow-md mb-3">
+                    <h4 class="font-bold text-gray-800 text-sm mb-1">核心课</h4>
+                    <p class="text-xs text-gray-500">系统化学习，全面提升核心能力</p>
+                  </div>
+                  <div class="space-y-2">
+                    <template x-for="course in getCourses()" :key="course.day">
+                      <div class="rounded-xl p-3 shadow-sm transition-all" :class="course.highlight ? 'bg-white ring-2 ring-yuan-400 ring-offset-1' : 'bg-white/90'">
+                        <div class="flex items-center gap-3">
+                          <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
+                            :class="course.highlight ? 'bg-gradient-to-br from-yuan-500 to-yuan-600' : 'bg-gradient-to-br from-gray-400 to-gray-500'">
+                            <span x-text="course.day"></span>
+                          </div>
+                          <div class="flex-1 min-w-0">
+                            <div class="font-semibold text-gray-800 text-xs" x-text="course.name"></div>
+                            <div class="text-[10px] text-gray-400" x-text="course.desc"></div>
+                          </div>
+                          <template x-if="course.highlight">
+                            <span class="text-[10px] bg-yuan-100 text-yuan-700 font-bold px-2 py-0.5 rounded-full flex-shrink-0">重点</span>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 py-5 bg-[#FF6D00]">
+            <div class="bg-white rounded-2xl p-5 text-center shadow-lg">
+              <div class="flex justify-center mb-2">
+                <div class="w-10 h-10 rounded-full bg-yuan-100 flex items-center justify-center">
+                  <iconify-icon icon="lucide:rocket" width="22" class="text-yuan-600"></iconify-icon>
+                </div>
+              </div>
+              <p class="text-sm text-gray-700 font-semibold mb-1" x-text="'猿辅导陪 ' + planStudent.name + ' 同学一起加油！'"></p>
+              <p class="text-xs text-gray-400">每一步进步，都值得被看见</p>
+            </div>
+          </div>
+          <div class="px-5 py-6 bg-gradient-to-b from-[#FF6D00] to-[#E55D00] text-center">
+            <p class="text-white/60 text-[10px] tracking-wider">猿辅导 · 让每个孩子都成为更好的自己</p>
+            <p class="text-white/40 text-[9px] mt-1" x-text="'生成时间：' + new Date().toLocaleDateString('zh-CN')"></p>
+          </div>
+        </div>
+      </div>
+      <div x-show="saveToast" x-transition class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-xl shadow-xl flex items-center gap-2 text-sm z-50">
+        <iconify-icon icon="lucide:check-circle" class="text-green-400" width="18"></iconify-icon> <span x-text="toastMsg"></span>
+      </div>
+    </div>
+  </template>
+
+  <!-- ==================== DELETE MODAL ==================== -->
+  <template x-if="showDeleteModal">
+    <div class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" @click.self="showDeleteModal = false">
+      <div class="bg-white rounded-2xl p-6 w-80 max-w-full shadow-2xl fade-in-up">
+        <div class="text-center mb-4">
+          <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-3">
+            <iconify-icon icon="lucide:alert-triangle" class="text-red-500" width="24"></iconify-icon>
+          </div>
+          <h3 class="font-bold text-gray-800">确认删除</h3>
+          <p class="text-sm text-gray-500 mt-1">确定要删除该学员的所有数据吗？</p>
+        </div>
+        <div class="flex gap-3">
+          <button @click="showDeleteModal = false" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50">取消</button>
+          <button @click="executeDeleteStudent()"
+            class="flex-1 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600">删除</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- ==================== IMPORT MODAL ==================== -->
+  <div x-show="showImportModal" class="fixed inset-0 bg-black/50 z-[90] flex items-center justify-center p-4" x-transition>
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm fade-in-up" @click.away="showImportModal = false">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-yuan-100 flex items-center justify-center">
+          <iconify-icon icon="lucide:download" class="text-yuan-600" width="20"></iconify-icon>
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-800">导入数据</h3>
+          <p class="text-xs text-gray-400">粘贴其他老师发给你的数据码</p>
+        </div>
+      </div>
+      <textarea x-model="importCode" placeholder="在此粘贴数据码..." rows="5"
+        class="w-full px-4 py-3 border border-gray-200 rounded-xl text-xs font-mono resize-none mb-4"></textarea>
+      <div class="flex gap-3">
+        <button @click="showImportModal = false; importCode = ''" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50">取消</button>
+        <button @click="importData()" :disabled="!importCode.trim()"
+          class="flex-1 py-2.5 bg-gradient-to-r from-yuan-600 to-yuan-500 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50">
+          导入并查看
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== COPY TOAST ==================== -->
+  <div x-show="copyToast" x-transition
+    class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-xl shadow-xl flex items-center gap-2 text-sm z-[100]">
+    <iconify-icon icon="lucide:check-circle" width="18"></iconify-icon>
+    <span x-text="copyToastMsg"></span>
+  </div>
+
+  <!-- ==================== SCRIPT ==================== -->
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('app', () => ({
+        // ========== AUTH ==========
+        currentPage: 'login',
+        userName: '',
+        loginName: '',
+        nowTick: Date.now(),
+        deadlineTimer: null,
+
+        // ========== DATA ==========
+        students: [],
+        batches: [],
+        currentBatch: '',
+        showBatchInput: false,
+        newBatchName: '',
+
+        // ========== NAVIGATION ==========
+        currentView: 'empty',
+        showPlan: false,
+        showSidebar: false,
+        collapsedDeadlineSections: {},
+
+        // ========== STUDENT ==========
+        selectedStudent: null,
+        planStudent: null,
+        searchQuery: '',
+	        filterMode: 'all', // 'all', 'pending_test', 'test_done', 'overdue'
+	        weakPointTags: ['计算不好', '几何不好', '应用题不好', '阅读理解不好', '作文不好', '语法不好', '词汇量不足', '审题不清'],
+	        quickScores: [95, 90, 85, 80, 75, 70, 60],
+	        supervisorOptions: ['妈妈', '爸爸', '爷爷奶奶', '姥姥姥爷', '父母共同负责'],
+		        dismissalOptions: ['17:00', '17:30', '18:00', '18:30', '19:00'],
+		        homeArrivalOptions: ['17:00', '17:30', '18:00', '18:30', '19:00'],
+	        homeworkOptions: ['30分钟内', '1小时左右', '1.5小时左右', '2小时左右', '2小时以上'],
+	        tutoringOptions: ['无', '有数学班', '有英语班', '有语文班', '周末补习较多'],
+	        noteOptions: ['家长重视学习', '孩子主动性一般', '家长关注提分', '时间安排较紧', '需要老师多督促'],
+	        testNoteOptions: ['计算准确率不稳定', '应用题审题容易漏条件', '基础概念掌握不牢', '图形题思路不清晰', '做题速度偏慢'],
+	        callIssueOptions: ['孩子学习习惯需要督促', '课后练习完成度需跟进', '家长期待明确学习安排'],
+		        form: { name: '', chineseScore: '', mathScore: '', englishScore: '', weakTags: [], weakPoints: '', notes: '', hasApp: '', supervisor: '', dismissalTime: '', homeArrivalTime: '', homeworkTime: '', tutoring: '', testDeadline: '' },
+	        testForm: { testNotes: '', callIssues: '' },
+        statusBannerName: '',
+        copiedBanner: false,
+
+        // ========== COPY ==========
+        copiedInfo: false,
+        copyToast: false,
+        copyToastMsg: '',
+        parentCardBlob: null,
+        parentCardBlobStudentId: '',
+        parentCardBlobAt: 0,
+        parentCardRendering: false,
+
+        // ========== UI ==========
+        showDeleteModal: false,
+        showImportModal: false,
+        importCode: '',
+        saveToast: false,
+        toastMsg: '图片已保存',
+
+        // ========== COMPUTED ==========
+        get batchStudents() {
+          if (!this.currentBatch) return this.students;
+          return this.students.filter(s => s.batch === this.currentBatch);
+        },
+        get filteredStudents() {
+          let list = this.batchStudents;
+          if (this.filterMode === 'pending_test') {
+            list = list.filter(s => s.status === 'pending_test');
+          } else if (this.filterMode === 'test_done') {
+            list = list.filter(s => this.normalizedStatus(s.status) === 'test_done');
+          } else if (this.filterMode === 'overdue') {
+            list = list.filter(s => this.isStudentOverdue(s));
+          }
+          if (this.searchQuery.trim()) {
+            const q = this.searchQuery.trim().toLowerCase();
+            list = list.filter(s => s.name?.toLowerCase().includes(q));
+          }
+          if (this.filterMode === 'pending_test' || this.filterMode === 'overdue') {
+            list = [...list].sort((a, b) => {
+              if (a.testDeadline && !b.testDeadline) return -1;
+              if (!a.testDeadline && b.testDeadline) return 1;
+              if (a.testDeadline && b.testDeadline) return a.testDeadline.localeCompare(b.testDeadline);
+              return 0;
+            });
+          }
+          return list;
+        },
+        get studentDeadlineSections() {
+          const list = this.filteredStudents;
+          if (!list.length) return [];
+          const groups = [];
+          const groupMap = new Map();
+          const others = [];
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const todayLabel = (today.getMonth() + 1) + '月' + today.getDate() + '日';
+          const tomorrow = new Date(today);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          const tomorrowLabel = (tomorrow.getMonth() + 1) + '月' + tomorrow.getDate() + '日';
+
+          const ensureGroup = (key, label, isReminder = false, order = 0, tone = 'default') => {
+            if (!groupMap.has(key)) {
+              const group = { key, label, isReminder, order, tone, students: [] };
+              groupMap.set(key, group);
+              groups.push(group);
+            }
+            return groupMap.get(key);
+          };
+
+          list.forEach(s => {
+            const info = this.parseDeadlineInfo(s.testDeadline);
+            const isPending = this.normalizedStatus(s.status) === 'pending_test';
+            if (!isPending) {
+              others.push(s);
+              return;
+            }
+            if (this.isStudentOverdue(s)) {
+              const label = info ? '已超时 ' + this.relativeDeadlineLabel(info) : '已超时';
+              ensureGroup('overdue-' + (info ? info.dateLabel + '-' + info.time : 'unknown'), label, true, -10000 + (info ? info.dateOrder * 1440 + info.minutes : 0), 'danger').students.push(s);
+              return;
+            }
+            if (info && info.dateLabel === todayLabel) {
+              ensureGroup('today-' + info.time, '今天 ' + info.time, true, info.minutes).students.push(s);
+              return;
+            }
+            if (info && info.dateLabel === tomorrowLabel) {
+              ensureGroup('tomorrow-' + info.time, '明天 ' + info.time, true, 2000 + info.minutes).students.push(s);
+              return;
+            }
+            if (info) {
+              ensureGroup('date-' + info.dateLabel + '-' + info.time, info.dateLabel + ' ' + info.time, false, 10000 + info.dateOrder * 1440 + info.minutes).students.push(s);
+              return;
+            }
+            if (this.filterMode === 'pending_test') {
+              ensureGroup('no-deadline', '未设截止时间', false, 20000).students.push(s);
+              return;
+            }
+            others.push(s);
+          });
+
+          groups.sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
+          if (others.length) {
+            groups.push({
+              key: 'other-students',
+              label: this.filterMode === 'pending_test' ? '其他待摸底' : '其他学员',
+              isReminder: false,
+              order: 30000,
+              students: others
+            });
+          }
+          return groups;
+        },
+        isSectionCollapsed(key) {
+          return !!this.collapsedDeadlineSections[key];
+        },
+        toggleDeadlineSection(key) {
+          this.collapsedDeadlineSections = {
+            ...this.collapsedDeadlineSections,
+            [key]: !this.collapsedDeadlineSections[key]
+          };
+        },
+        relativeDeadlineLabel(info) {
+          if (!info) return '';
+          if (info.dateOrder === 0) return '今天 ' + info.time;
+          if (info.dateOrder === 1) return '明天 ' + info.time;
+          return info.dateLabel + ' ' + info.time;
+        },
+        studentCardClass(s) {
+          if (this.isStudentOverdue(s)) {
+            return this.selectedStudent?.id === s.id ? 'border-red-500 bg-red-50 shadow-md' : 'border-red-300 bg-red-50 hover:bg-red-100';
+          }
+          return this.selectedStudent?.id === s.id ? 'border-yuan-400 bg-yuan-50 shadow-md' : 'border-transparent bg-gray-50 hover:bg-gray-100';
+        },
+        deadlinePillClass(s) {
+          return this.isStudentOverdue(s)
+            ? 'bg-red-100 border-red-300 text-red-700'
+            : 'bg-amber-50 border-amber-200 text-amber-700';
+        },
+        studentStatusText(s) {
+          if (this.isStudentOverdue(s)) return '已超时';
+          return this.statusText(s.status);
+        },
+        studentStatusColor(s) {
+          if (this.isStudentOverdue(s)) return 'bg-red-100 text-red-700';
+          return this.statusColor(s.status);
+        },
+        getDeadlineAt(deadline) {
+          const info = this.parseDeadlineInfo(deadline);
+          return info ? info.targetAt : null;
+        },
+        isStudentOverdue(s) {
+          if (!s || this.normalizedStatus(s.status) !== 'pending_test' || !s.testDeadline) return false;
+          const deadlineAt = this.getDeadlineAt(s.testDeadline);
+          return !!deadlineAt && this.nowTick > deadlineAt + 30 * 60 * 1000;
+        },
+        saveOverdueReason(student) {
+          if (!student) return;
+          const idx = this.students.findIndex(s => s.id === student.id);
+          if (idx < 0) return;
+          this.students[idx].overdueReason = (student.overdueReason || '').trim();
+          this.saveData();
+          if (this.selectedStudent?.id === student.id) this.selectedStudent = { ...this.students[idx] };
+        },
+        saveSelectedOverdueReason() {
+          this.saveOverdueReason(this.selectedStudent);
+        },
+	        setFilter(mode) {
+	          this.filterMode = this.filterMode === mode ? 'all' : mode;
+	        },
+	        appendText(current, text) {
+	          const cur = (current || '').trim();
+	          if (!cur) return text;
+	          const sep = /[。！？；;]$/.test(cur) ? '' : '；';
+	          return cur + sep + text;
+	        },
+	        appendFormText(field, text) {
+	          this.form[field] = this.appendText(this.form[field], text);
+	        },
+	        appendTestText(field, text) {
+	          this.testForm[field] = this.appendText(this.testForm[field], text);
+	        },
+	        toDateTimeLocal(d) {
+	          const pad = n => String(n).padStart(2, '0');
+	          return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+	        },
+        getDeadlineHint(deadline) {
+          if (!deadline) return '请尽快完成摸底测，完成后即可安排分班';
+          const match = String(deadline).match(/(\d+)月(\d+)日\s+(\d{1,2}):(\d{2})/);
+          if (!match) return '请尽快完成摸底测，完成后即可安排分班';
+	          const now = new Date();
+	          const target = new Date(now.getFullYear(), Number(match[1]) - 1, Number(match[2]), Number(match[3]), Number(match[4]));
+          const diff = target.getTime() - now.getTime();
+          if (diff <= 0) return '已到截止时间，请尽快完成！';
+          const totalMinutes = Math.ceil(diff / 60000);
+          const hours = Math.floor(totalMinutes / 60);
+          const minutes = totalMinutes % 60;
+          if (hours >= 24) return '距离截止还有 ' + Math.ceil(hours / 24) + ' 天，请尽快完成！';
+          if (hours > 0) return '距离截止还有 ' + hours + ' 小时' + (minutes ? ' ' + minutes + ' 分钟' : '') + '，请尽快完成！';
+          return '距离截止还有 ' + minutes + ' 分钟，请尽快完成！';
+        },
+	        setDeadlinePreset(type) {
+	          const d = new Date();
+		          const map = {
+		            tonight1900: [19, 0],
+		            tonight2000: [20, 0],
+		            tonight2030: [20, 30],
+		            tonight2100: [21, 0]
+		          };
+		          const preset = map[type] || map.tonight2000;
+		          d.setHours(preset[0], preset[1], 0, 0);
+	          this.form.testDeadline = this.toDateTimeLocal(d);
+	        },
+        parseDeadlineInfo(deadline) {
+          if (!deadline) return null;
+          const match = String(deadline).match(/(\d+)月(\d+)日\s+(\d{1,2}):(\d{2})/);
+          if (!match) return null;
+          const month = Number(match[1]);
+          const day = Number(match[2]);
+          const hour = Number(match[3]);
+          const minute = Number(match[4]);
+          const now = new Date();
+          const target = new Date(now.getFullYear(), month - 1, day, hour, minute, 0, 0);
+          const today = new Date(now);
+          today.setHours(0, 0, 0, 0);
+          if (target.getTime() < today.getTime() - 1000 * 60 * 60 * 24 * 180) {
+            target.setFullYear(target.getFullYear() + 1);
+          }
+          const dateOrder = Math.round((target.getTime() - today.getTime()) / 86400000);
+          return {
+            dateLabel: month + '月' + day + '日',
+            time: String(hour).padStart(2, '0') + ':' + String(minute).padStart(2, '0'),
+            minutes: hour * 60 + minute,
+            targetAt: target.getTime(),
+            dateOrder
+          };
+        },
+
+	        // ========== INIT ==========
+        init() {
+          if (!this.deadlineTimer) {
+            this.deadlineTimer = setInterval(() => { this.nowTick = Date.now(); }, 60000);
+          }
+          const saved = localStorage.getItem('cs5_standalone_user');
+          if (saved) {
+            this.userName = saved;
+            this.currentPage = 'main';
+            this.loadData();
+          }
+        },
+
+        // ========== AUTH ==========
+        login() {
+          const name = this.loginName.trim();
+          if (!name) return;
+          this.userName = name;
+          localStorage.setItem('cs5_standalone_user', name);
+          this.currentPage = 'main';
+          this.loadData();
+        },
+        logout() {
+          localStorage.removeItem('cs5_standalone_user');
+          this.userName = '';
+          this.currentPage = 'login';
+          this.loginName = '';
+          this.students = [];
+          this.batches = [];
+          this.currentBatch = '';
+          this.selectedStudent = null;
+          this.showSidebar = false;
+        },
+
+        // ========== DATA (localStorage) ==========
+        loadData() {
+          const key = 'cs5_students_' + this.userName;
+          const raw = localStorage.getItem(key);
+          this.students = raw ? JSON.parse(raw) : [];
+          const bk = 'cs5_batches_' + this.userName;
+          const br = localStorage.getItem(bk);
+          this.batches = br ? JSON.parse(br) : [];
+          const ck = 'cs5_currentBatch_' + this.userName;
+          this.currentBatch = localStorage.getItem(ck) || '';
+        },
+        saveData() {
+          const key = 'cs5_students_' + this.userName;
+          localStorage.setItem(key, JSON.stringify(this.students));
+          const bk = 'cs5_batches_' + this.userName;
+          localStorage.setItem(bk, JSON.stringify(this.batches));
+          const ck = 'cs5_currentBatch_' + this.userName;
+          localStorage.setItem(ck, this.currentBatch);
+        },
+
+        // ========== BATCH MANAGEMENT ==========
+        addBatch() {
+          const name = this.newBatchName.trim();
+          if (!name) return;
+          if (this.batches.includes(name)) { alert('该期数已存在'); return; }
+          this.batches.push(name);
+          this.currentBatch = name;
+          this.showBatchInput = false;
+          this.newBatchName = '';
+          this.saveData();
+        },
+        switchBatch(b) {
+          this.currentBatch = b;
+          this.selectedStudent = null;
+          this.currentView = 'empty';
+          this.filterMode = 'all';
+          this.saveData();
+        },
+        deleteBatch(b) {
+          const count = this.students.filter(s => s.batch === b).length;
+          if (count > 0 && !confirm(`"${b}"下有 ${count} 个学员，确定删除该期？学员数据不会丢失。`)) return;
+          this.batches = this.batches.filter(x => x !== b);
+          if (this.currentBatch === b) this.currentBatch = this.batches[this.batches.length - 1] || '';
+          this.selectedStudent = null;
+          this.currentView = 'empty';
+          this.saveData();
+        },
+
+        // ========== STUDENT MANAGEMENT ==========
+        selectStudent(s) {
+          this.selectedStudent = s;
+          this.statusBannerName = s.name || '';
+          this.copiedBanner = false;
+          this.currentView = 'detail';
+          this.showSidebar = false;
+          this.invalidateParentCardImage();
+          setTimeout(() => this.prepareParentCardImage(), 500);
+        },
+        newStudent() {
+          if (!this.currentBatch) { alert('请先创建一个期数'); return; }
+          this.selectedStudent = null;
+          this.currentView = 'firstCall';
+          this.showSidebar = false;
+          this.form = { name: '', chineseScore: '', mathScore: '', englishScore: '', weakTags: [], weakPoints: '', notes: '', hasApp: '', supervisor: '', dismissalTime: '', homeArrivalTime: '', homeworkTime: '', tutoring: '', testDeadline: '' };
+        },
+        cancelForm() { this.currentView = this.selectedStudent ? 'detail' : 'empty'; },
+        saveFirstCall() {
+          const wp = this.form.weakPoints.trim();
+          if (!wp) { alert('请至少选择一个薄弱点或手动填写'); return; }
+          if (!this.form.testDeadline) { alert('请填写摸底测截止完成时间'); return; }
+          const student = {
+            id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+            teacherName: this.userName,
+            name: this.form.name.trim(),
+            chineseScore: this.form.chineseScore ? Number(this.form.chineseScore) : null,
+            mathScore: this.form.mathScore ? Number(this.form.mathScore) : null,
+            englishScore: this.form.englishScore ? Number(this.form.englishScore) : null,
+            weakTags: [...this.form.weakTags], weakPoints: wp,
+            hasApp: this.form.hasApp || '',
+            notes: this.form.notes.trim(), supervisor: this.form.supervisor.trim(),
+            dismissalTime: this.form.dismissalTime.trim(), homeArrivalTime: this.form.homeArrivalTime.trim(),
+            homeworkTime: this.form.homeworkTime.trim(),
+            tutoring: this.form.tutoring.trim(),
+            testDeadline: this.form.testDeadline ? this.formatDeadline(this.form.testDeadline) : '',
+            batch: this.currentBatch,
+            grade: '四年级下册', status: 'pending_test',
+            createdAt: new Date().toISOString(),
+            pushed: false, pushedAt: ''
+          };
+          this.students.unshift(student);
+          this.saveData();
+          this.selectedStudent = student;
+          this.statusBannerName = student.name || '';
+          this.copiedBanner = false;
+          this.currentView = 'detail';
+          this.invalidateParentCardImage();
+          setTimeout(() => this.prepareParentCardImage(), 500);
+        },
+        editStatusBanner() {
+          const n = prompt('编辑学员名字', this.statusBannerName || this.selectedStudent.name);
+          if (n !== null && n.trim()) {
+            this.statusBannerName = n.trim();
+            this.invalidateParentCardImage();
+            setTimeout(() => this.prepareParentCardImage(), 300);
+          }
+        },
+        async copyStatusBanner() {
+          const text = (this.statusBannerName || this.selectedStudent.name) + '同学学习成绩已植入-完成摸底测后进行分班⭕️✅';
+          try { await navigator.clipboard.writeText(text); }
+          catch (e) { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }
+          this.copiedBanner = true;
+          setTimeout(() => { this.copiedBanner = false; }, 2000);
+        },
+        invalidateParentCardImage() {
+          this.parentCardBlob = null;
+          this.parentCardBlobStudentId = '';
+          this.parentCardBlobAt = 0;
+        },
+        async renderParentCardBlob() {
+          if (!this.selectedStudent) throw new Error('未选择学员');
+          const name = this.statusBannerName || this.selectedStudent.name || '同学';
+          const deadline = this.selectedStudent.testDeadline || '请尽快完成';
+          const hint = this.getDeadlineHint(this.selectedStudent.testDeadline);
+          const canvas = document.createElement('canvas');
+          canvas.width = 860;
+          canvas.height = 1220;
+          const ctx = canvas.getContext('2d');
+          const font = '"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif';
+          const cx = canvas.width / 2;
+
+          const roundRect = (x, y, w, h, r) => {
+            const rr = Math.min(r, w / 2, h / 2);
+            ctx.beginPath();
+            ctx.moveTo(x + rr, y);
+            ctx.arcTo(x + w, y, x + w, y + h, rr);
+            ctx.arcTo(x + w, y + h, x, y + h, rr);
+            ctx.arcTo(x, y + h, x, y, rr);
+            ctx.arcTo(x, y, x + w, y, rr);
+            ctx.closePath();
+          };
+          const fillRoundRect = (x, y, w, h, r, fill) => {
+            roundRect(x, y, w, h, r);
+            ctx.fillStyle = fill;
+            ctx.fill();
+          };
+          const strokeRoundRect = (x, y, w, h, r, stroke, lineWidth = 2) => {
+            roundRect(x, y, w, h, r);
+            ctx.strokeStyle = stroke;
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+          };
+          const centerText = (text, y, size, weight, color) => {
+            ctx.font = `${weight} ${size}px ${font}`;
+            ctx.fillStyle = color;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, cx, y);
+          };
+
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+          bg.addColorStop(0, '#FFFFFF');
+          bg.addColorStop(0.58, '#F2FBF7');
+          bg.addColorStop(1, '#F0FDF4');
+          fillRoundRect(1, 1, 858, 1218, 36, bg);
+          strokeRoundRect(1, 1, 858, 1218, 36, '#BBF7D0', 2);
+
+          const topGrad = ctx.createLinearGradient(20, 0, 840, 0);
+          topGrad.addColorStop(0, '#34D399');
+          topGrad.addColorStop(0.65, '#86EFAC');
+          topGrad.addColorStop(1, '#DCFCE7');
+          ctx.fillStyle = topGrad;
+          ctx.fillRect(30, 0, 800, 8);
+
+          fillRoundRect(277, 70, 306, 54, 27, '#ECFDF5');
+          strokeRoundRect(277, 70, 306, 54, 27, '#BBF7D0', 2);
+          centerText('学习进度确认', 98, 25, 800, '#047857');
+
+          fillRoundRect(375, 180, 110, 110, 28, '#34D399');
+          ctx.strokeStyle = '#FFFFFF';
+          ctx.lineWidth = 12;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.beginPath();
+          ctx.moveTo(405, 240);
+          ctx.lineTo(427, 263);
+          ctx.lineTo(462, 218);
+          ctx.stroke();
+
+          centerText(`${name}同学`, 365, 32, 700, '#6B7280');
+          centerText('成绩已植入', 435, 56, 900, '#047857');
+
+          fillRoundRect(60, 505, 740, 116, 26, 'rgba(255,255,255,0.95)');
+          strokeRoundRect(60, 505, 740, 116, 26, '#FED7AA', 2);
+          ctx.font = `900 33px ${font}`;
+          ctx.fillStyle = '#1F2937';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('完成摸底测，即可参与分班安排哦～', cx, 563);
+
+          const orange = ctx.createLinearGradient(60, 690, 800, 890);
+          orange.addColorStop(0, '#FF6D00');
+          orange.addColorStop(1, '#FF8C14');
+          fillRoundRect(60, 690, 740, 210, 28, orange);
+          centerText('摸底测截止时间', 750, 28, 800, 'rgba(255,255,255,0.92)');
+          centerText(deadline, 815, 54, 900, '#FFFFFF');
+          centerText(hint, 868, 25, 700, 'rgba(255,255,255,0.88)');
+
+          const ctaGrad = ctx.createLinearGradient(60, 955, 800, 1035);
+          ctaGrad.addColorStop(0, '#FF6D00');
+          ctaGrad.addColorStop(1, '#FF8C14');
+          fillRoundRect(60, 955, 740, 86, 28, ctaGrad);
+          centerText('打开猿辅导，完成摸底测', 998, 36, 900, '#FFFFFF');
+
+          centerText('摸底测已同步至猿辅导APP，打开即可参与', 1102, 26, 700, '#9CA3AF');
+
+          return new Promise((resolve, reject) => {
+            canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('截图生成失败')), 'image/png');
+          });
+        },
+        async prepareParentCardImage() {
+          if (!this.selectedStudent || this.parentCardRendering) return;
+          this.parentCardRendering = true;
+          try {
+            const blob = await this.renderParentCardBlob();
+            this.parentCardBlob = blob;
+            this.parentCardBlobStudentId = this.selectedStudent.id;
+            this.parentCardBlobAt = Date.now();
+          } catch (e) {
+            console.warn('Prepare parent card failed:', e);
+          } finally {
+            this.parentCardRendering = false;
+          }
+        },
+        blobToDataUrl(blob) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+        },
+        async copyRichImageFallback(blob) {
+          const dataUrl = await this.blobToDataUrl(blob);
+          const box = document.createElement('div');
+          box.contentEditable = 'true';
+          box.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;';
+          box.innerHTML = `<img src="${dataUrl}" alt="摸底测确认卡">`;
+          document.body.appendChild(box);
+          const range = document.createRange();
+          range.selectNodeContents(box);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+          const ok = document.execCommand('copy');
+          selection.removeAllRanges();
+          document.body.removeChild(box);
+          return ok;
+        },
+        async copyImageViaLocalServer(blob) {
+          const res = await fetch('http://127.0.0.1:8765/copy-card-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'image/png' },
+            body: blob
+          });
+          if (!res.ok) throw new Error('本机剪贴板服务不可用');
+          const data = await res.json();
+          if (!data.ok) throw new Error(data.error || '本机剪贴板写入失败');
+        },
+        shouldUseLocalClipboardServer() {
+          return ['127.0.0.1', 'localhost'].includes(window.location.hostname);
+        },
+        async copyParentCardImage() {
+          try {
+            this.copyToastMsg = '';
+            const isFresh = this.parentCardBlob
+              && this.parentCardBlobStudentId === this.selectedStudent?.id
+              && Date.now() - this.parentCardBlobAt < 60000;
+            const blob = isFresh ? this.parentCardBlob : await this.renderParentCardBlob();
+            this.parentCardBlob = blob;
+            this.parentCardBlobStudentId = this.selectedStudent?.id || '';
+            this.parentCardBlobAt = Date.now();
+            const downloadImage = () => {
+              const link = document.createElement('a');
+              link.download = (this.selectedStudent?.name || '学员') + '_摸底测确认卡.png';
+              link.href = URL.createObjectURL(blob);
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(link.href);
+            };
+            if (this.shouldUseLocalClipboardServer()) {
+              try {
+                await this.copyImageViaLocalServer(blob);
+                this.copyToastMsg = '确认卡图片已复制，可直接粘贴发给家长';
+              } catch (serverError) {
+                console.warn('Local clipboard server unavailable:', serverError);
+              }
+            }
+            if (!this.copyToastMsg || !this.copyToastMsg.includes('已复制')) {
+              if (navigator.clipboard && window.ClipboardItem) {
+                try {
+                  await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+                  this.copyToastMsg = '确认卡图片已复制，可直接粘贴发给家长';
+                } catch (e) {
+                  const richCopied = await this.copyRichImageFallback(blob);
+                  if (richCopied) {
+                    this.copyToastMsg = '确认卡图片已复制，可直接粘贴发给家长';
+                  } else {
+                    downloadImage();
+                    this.copyToastMsg = '图片复制受限，已自动下载';
+                  }
+                }
+              } else {
+                const richCopied = await this.copyRichImageFallback(blob);
+                if (richCopied) {
+                  this.copyToastMsg = '确认卡图片已复制，可直接粘贴发给家长';
+                } else {
+                  downloadImage();
+                  this.copyToastMsg = '图片复制受限，已自动下载';
+                }
+              }
+            }
+            this.copiedBanner = true;
+            this.copyToast = true;
+            setTimeout(() => { this.copiedBanner = false; this.copyToast = false; }, 3000);
+          } catch (e) {
+            console.error('Parent card capture failed:', e);
+            this.copyToastMsg = '截图生成失败，请手动截图';
+            this.copyToast = true;
+            setTimeout(() => { this.copyToast = false; }, 3000);
+          }
+        },
+        formatDeadline(val) {
+          if (!val) return '';
+          const d = new Date(val);
+          return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+        },
+        completeTest(student = this.selectedStudent) {
+          if (!student) return;
+          if (this.isStudentOverdue(student) && !(student.overdueReason || '').trim()) {
+            alert('该学员已超时，请先填写超时原因');
+            return;
+          }
+          const idx = this.students.findIndex(s => s.id === student.id);
+          if (idx < 0) return;
+          this.students[idx].overdueReason = (student.overdueReason || this.students[idx].overdueReason || '').trim();
+          this.students[idx].status = 'test_done';
+          this.students[idx].testCompletedAt = new Date().toISOString();
+          this.saveData();
+          this.selectedStudent = { ...this.students[idx] };
+          this.currentView = 'detail';
+          this.copyToastMsg = (this.selectedStudent.name || '学员') + '已放入已摸底';
+          this.copyToast = true;
+          setTimeout(() => { this.copyToast = false; }, 2000);
+        },
+        saveTestResults() {
+          const idx = this.students.findIndex(s => s.id === this.selectedStudent.id);
+          if (idx < 0) return;
+          this.students[idx].testNotes = this.testForm.testNotes.trim();
+          this.students[idx].callIssues = this.testForm.callIssues.trim();
+          this.students[idx].status = 'test_done';
+          this.students[idx].testCompletedAt = new Date().toISOString();
+          this.saveData();
+          this.selectedStudent = { ...this.students[idx] };
+          this.currentView = 'detail';
+        },
+        confirmDeleteStudent() { this.showDeleteModal = true; },
+        executeDeleteStudent() {
+          this.students = this.students.filter(s => s.id !== this.selectedStudent.id);
+          this.saveData();
+          this.showDeleteModal = false;
+          this.selectedStudent = null;
+          this.currentView = 'empty';
+        },
+        generatePlan() {
+          this.planStudent = { ...this.selectedStudent };
+          this.showPlan = true;
+          if (this.selectedStudent.status !== 'plan_generated') {
+            const idx = this.students.findIndex(s => s.id === this.selectedStudent.id);
+            if (idx >= 0) {
+              this.students[idx].status = 'plan_generated';
+              this.selectedStudent.status = 'plan_generated';
+              this.saveData();
+            }
+          }
+        },
+        toggleWeakTag(tag) {
+          const idx = this.form.weakTags.indexOf(tag);
+          if (idx >= 0) {
+            this.form.weakTags.splice(idx, 1);
+            let text = this.form.weakPoints;
+            text = text.replace(new RegExp('、?' + tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '、?'), (m) => m.startsWith('、') && m.endsWith('、') ? '、' : '');
+            this.form.weakPoints = text.replace(/^、|、$/g, '').trim();
+          } else {
+            this.form.weakTags.push(tag);
+            const cur = this.form.weakPoints.trim();
+            if (cur) { const lc = cur.slice(-1); this.form.weakPoints = cur + (['、','，',',','；',';',' '].includes(lc) ? '' : '、') + tag; }
+            else { this.form.weakPoints = tag; }
+          }
+        },
+
+        // ========== EXPORT / IMPORT ==========
+        async exportData() {
+          const payload = { v: 1, userName: this.userName, students: this.students, batches: this.batches };
+          const json = JSON.stringify(payload);
+          const code = btoa(unescape(encodeURIComponent(json)));
+          await this.clipCopy(code);
+          this.copyToastMsg = '数据码已复制，发给主管即可导入查看';
+          this.copyToast = true;
+          setTimeout(() => this.copyToast = false, 3000);
+        },
+        importData() {
+          try {
+            const json = decodeURIComponent(escape(atob(this.importCode.trim())));
+            const data = JSON.parse(json);
+            if (!data.userName || !data.students) { alert('数据码格式不正确'); return; }
+            const sKey = 'cs5_students_' + data.userName;
+            const bKey = 'cs5_batches_' + data.userName;
+            localStorage.setItem(sKey, JSON.stringify(data.students));
+            if (data.batches) localStorage.setItem(bKey, JSON.stringify(data.batches));
+            this.userName = data.userName;
+            localStorage.setItem('cs5_standalone_user', data.userName);
+            this.loadData();
+            this.currentPage = 'main';
+            this.showImportModal = false;
+            this.importCode = '';
+            this.copyToastMsg = '导入成功！已切换到「' + data.userName + '」的数据';
+            this.copyToast = true;
+            setTimeout(() => this.copyToast = false, 3000);
+          } catch (e) { alert('数据码解析失败，请检查是否完整粘贴'); }
+        },
+
+        // ========== COPY TO CLIPBOARD ==========
+        buildStudentText(s) {
+          let t = `📋 学员首通信息\n`;
+          t += `━━━━━━━━━━━━━━━━\n`;
+          t += `👤 老师：${this.userName}\n`;
+          t += `⏰ 时间：${new Date().toLocaleString('zh-CN')}\n`;
+          if (s.batch) t += `📅 期数：${s.batch}\n`;
+          t += `\n🎓 学员姓名：${s.name}\n`;
+          t += `📚 年级：四年级下册\n`;
+          if (s.chineseScore || s.mathScore || s.englishScore) {
+            t += `📊 当前成绩：语文 ${s.chineseScore || '-'} | 数学 ${s.mathScore || '-'} | 英语 ${s.englishScore || '-'}\n`;
+          }
+          t += `⚠️ 薄弱点：${s.weakPoints || '未填写'}\n`;
+	          if (s.supervisor) t += `👨‍👩‍👧 学习负责人：${s.supervisor}\n`;
+	          if (s.dismissalTime) t += `🏫 放学时间：${s.dismissalTime}\n`;
+	          if (s.homeArrivalTime) t += `🏠 到家时间：${s.homeArrivalTime}\n`;
+	          if (s.homeworkTime) t += `📖 作业时间：${s.homeworkTime}\n`;
+          if (s.tutoring) t += `📅 补习班：${s.tutoring}\n`;
+          if (s.testDeadline) t += `⏳ 摸底截止：${s.testDeadline}\n`;
+          if (s.overdueReason) t += `🔴 超时原因：${s.overdueReason}\n`;
+          if (s.hasApp) t += `📱 下载猿辅导APP：${s.hasApp}\n`;
+          if (s.notes) t += `💬 首通备注：${s.notes}\n`;
+          if (s.testNotes) t += `🔍 摸底分析：${s.testNotes}\n`;
+          if (s.callIssues) t += `📞 首通问题：${s.callIssues}\n`;
+          const st = this.statusText(s.status);
+          t += `\n✅ 当前状态：${st}`;
+          return t;
+        },
+        buildPlanText(s) {
+          let t = `🎓 学习提分规划\n`;
+          t += `━━━━━━━━━━━━━━━━\n`;
+          t += `👤 老师：${this.userName}\n`;
+          t += `⏰ 时间：${new Date().toLocaleString('zh-CN')}\n\n`;
+          t += `📌 学员：${s.name} 同学 | 四年级下册\n`;
+          if (s.chineseScore || s.mathScore || s.englishScore) {
+            t += `📊 成绩：语文 ${s.chineseScore || '-'} | 数学 ${s.mathScore || '-'} | 英语 ${s.englishScore || '-'}`;
+            t += `\n`;
+          }
+          t += `⚠️ 薄弱点：${s.weakPoints || '-'}\n`;
+          if (s.testNotes) t += `🔍 摸底分析：${s.testNotes}\n`;
+          t += `\n📍 提分路径规划\n`;
+          t += `1️⃣ 1v1 摸底测错题讲题\n`;
+          t += `2️⃣ 口述题验收\n`;
+          t += `3️⃣ 大班答疑\n`;
+          t += `4️⃣ 核心课（6节系统课程+自主学习）\n`;
+          t += `\n💪 猿辅导陪 ${s.name} 同学一起加油！`;
+          return t;
+        },
+        async clipCopy(text) {
+          try { await navigator.clipboard.writeText(text); }
+          catch (e) { const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }
+        },
+        async copyStudentInfo() {
+          if (!this.selectedStudent) return;
+          const text = this.buildStudentText(this.selectedStudent);
+          await this.clipCopy(text);
+          this.copiedInfo = true;
+          const idx = this.students.findIndex(s => s.id === this.selectedStudent.id);
+          if (idx >= 0) {
+            this.students[idx].pushed = true;
+            this.students[idx].pushedAt = new Date().toLocaleString('zh-CN');
+            this.selectedStudent = { ...this.students[idx] };
+            this.saveData();
+          }
+          this.copyToastMsg = '已复制学员信息，去企微群粘贴发送吧';
+          this.copyToast = true;
+          setTimeout(() => { this.copyToast = false; this.copiedInfo = false; }, 3000);
+        },
+        async copyPlanInfo() {
+          if (!this.planStudent) return;
+          const text = this.buildPlanText(this.planStudent);
+          await this.clipCopy(text);
+          this.copiedInfo = true;
+          const idx = this.students.findIndex(s => s.id === this.planStudent.id);
+          if (idx >= 0) {
+            this.students[idx].pushed = true;
+            this.students[idx].pushedAt = new Date().toLocaleString('zh-CN');
+            this.saveData();
+          }
+          this.copyToastMsg = '已复制学习规划，去企微群粘贴发送吧';
+          this.copyToast = true;
+          setTimeout(() => { this.copyToast = false; this.copiedInfo = false; }, 3000);
+        },
+
+        // ========== HELPERS ==========
+        normalizedStatus(st) { return st === 'plan_generated' ? 'test_done' : st; },
+        statusText(st) { return { pending_test: '待摸底', test_done: '已摸底' }[this.normalizedStatus(st)] || '未知'; },
+        statusColor(st) { return { pending_test: 'bg-amber-100 text-amber-700', test_done: 'bg-blue-100 text-blue-700' }[this.normalizedStatus(st)] || 'bg-gray-100 text-gray-600'; },
+        getScoreColor(score) {
+          if (!score) return 'text-gray-400';
+          const s = Number(score);
+          return s >= 90 ? 'text-green-600' : s >= 75 ? 'text-yuan-600' : s >= 60 ? 'text-amber-600' : 'text-red-500';
+        },
+        getStationTip(station) {
+          const s = this.planStudent; if (!s) return '';
+          const c = ((s.weakPoints || '') + (s.testNotes || '')).toLowerCase();
+          if (station === 1) return s.mathTest && s.mathScore && Number(s.mathTest) < Number(s.mathScore) ? '数学摸底测低于平时成绩，重点攻克错题薄弱环节' : '针对摸底测错题进行专项讲解，找准薄弱环节';
+          if (station === 2) return c.includes('理解') || c.includes('概念') ? '重点验收概念理解类题目，确保融会贯通' : '通过口述强化解题思路，培养逻辑表达能力';
+          if (station === 3) return '在答疑环节重点解决个性化疑难问题';
+          return '';
+        },
+        getCourses() {
+          const s = this.planStudent;
+          const wp = ((s?.weakPoints || '') + (s?.testNotes || '')).toLowerCase();
+          const courses = [
+            { day: '周天', name: '导学课', desc: '开启学习之旅，了解课程体系', category: '', highlight: false },
+            { day: '周一', name: '计算加速器', desc: '提升计算速度与准确率', category: '计算', highlight: false },
+            { day: '周二', name: '犬牙的奥秘', desc: '掌握集合思想，拓展数学视野', category: '集合', highlight: false },
+            { day: '周三', name: '鸡兔同笼', desc: '攻克经典应用题，提升解题能力', category: '应用', highlight: false },
+            { day: '周四', name: '一招搞定消长问题', desc: '培养数学思维，举一反三', category: '思维', highlight: false },
+            { day: '周五', name: '两大方法搞定概括', desc: '提升阅读理解，掌握概括技巧', category: '阅读技巧', highlight: false },
+          ];
+          const kw = { '计算':['计算','运算','口算'], '集合':['集合','分类'], '应用':['应用题','解题','审题','应用'], '思维':['思维','逻辑','推理'], '阅读技巧':['阅读','理解','概括','作文','语文','写作'] };
+          const mL = s && ((s.mathScore && Number(s.mathScore) < 80) || (s.mathTest && Number(s.mathTest) < 80));
+          const cL = s && (s.chineseScore && Number(s.chineseScore) < 80);
+          courses.forEach(c => {
+            if (c.category && kw[c.category] && kw[c.category].some(k => wp.includes(k))) c.highlight = true;
+            if (mL && ['计算','集合','应用','思维'].includes(c.category)) c.highlight = true;
+            if (cL && c.category === '阅读技巧') c.highlight = true;
+          });
+          return courses;
+        },
+        async savePlanImage() {
+          const el = document.getElementById('planPoster');
+          if (!el) return;
+          try {
+            const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: null, logging: false });
+            const link = document.createElement('a');
+            link.download = this.planStudent.name + '_学习提分规划.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            this.toastMsg = '图片已保存';
+            this.saveToast = true;
+            setTimeout(() => { this.saveToast = false; }, 2000);
+          } catch (e) { console.error('Save failed:', e); }
+        }
+      }));
+    });
+  </script>
+  <script defer src="./vendor/alpinejs.cdn.min.js"></script>
+</body>
+</html>
